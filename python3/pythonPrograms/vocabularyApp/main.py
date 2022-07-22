@@ -120,7 +120,7 @@ if __name__ == '__main__':
     whiteColor = (255,255,255)
     screenSize = (WINDOW_W, WINDOW_H)
 
-    quitFlag = True
+    continueFlag = True
     leftClickCnt = 0
 
 
@@ -159,73 +159,68 @@ if __name__ == '__main__':
 
     t1 = threading.Thread(target=readOutLoudly, args=(myDict["Vocabulary"],))
     t1.start()
-
-
-    while quitFlag:
-
+    a = 10
+    pressedMousePos = -1
+    while continueFlag:
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
-                quitFlag = False
-            elif event.type == MOUSEMOTION:
-                #return the X and Y position of the mouse cursor
-                pos = pygame.mouse.get_pos()
-                mouse_x = pos[0]
-                mouse_y = pos[1]
+                continueFlag = False
             elif event.type == MOUSEBUTTONDOWN:
+                continueFlag = True
                 pressed_array = pygame.mouse.get_pressed()
                 for index in range(len(pressed_array)):
                     if pressed_array[index]:
-                        if index == 0:
-                            app.fillbgColor(blackColor)
-                            app.blitImg("BG",(0,0))
-                            #print('Pressed LEFT Button!')
-                            leftClickCnt = leftClickCnt + 1
-                            vocabShowInApp = vocabularyDict(app, myDict)
-                            vocabShowInApp.showVocab(whiteColor, WINDOW_W / 2, leftClickCnt)
-                            #vocabShowInApp.showRecordInfo("正在学习第" + str(myVocabulary.indexRow) + "/" + str(rowNumber) + "个单词...",whiteColor,(0,0))
+                        pressedMousePos = index
+                        print(pressedMousePos)
+                        print(a)
+                        a += 1
 
-                            t1.join()
-                            app.updateDisp()
+        if pressedMousePos < 0:
+            continue
+        elif pressedMousePos == 0:
+            app.fillbgColor(blackColor)
+            app.blitImg("BG",(0,0))
+            #print('Pressed LEFT Button!')
+            leftClickCnt = leftClickCnt + 1
+            vocabShowInApp = vocabularyDict(app, myDict)
+            vocabShowInApp.showVocab(whiteColor, WINDOW_W / 2, leftClickCnt)
+            #vocabShowInApp.showRecordInfo("正在学习第" + str(myVocabulary.indexRow) + "/" + str(rowNumber) + "个单词...",whiteColor,(0,0))
 
-                            if leftClickCnt > 3:
-                                t1 = threading.Thread(target=readOutLoudly, args=(myDict["Sentence"],))
-                                t1.start()
-                            else:
-                                t1 = threading.Thread(target=readOutLoudly, args=(myDict["Vocabulary"],))
-                                t1.start()
-                        elif index == 1:
-                            t1.join()
-                            #print('The mouse wheel Pressed!')
-                        elif index == 2:
+            t1.join()
+            app.updateDisp()
 
-                            ret = retrievedData[Dataindex]
-                            myDict = dict()
-                            myDict["Vocabulary"] = ret[columEnum.Vocabulary.value]
-                            myDict["Pronounce"] = ret[columEnum.Pronounce.value]
-                            myDict["Split"] = ret[columEnum.Split.value]
-                            myDict["Chinese"] = ret[columEnum.Chinese.value]
-                            myDict["RememberTips"] = ret[columEnum.RememberTips.value]
-                            myDict["RememberImage"] = ret[columEnum.RememberImage.value]
-                            myDict["Sentence"] = ret[columEnum.Sentence.value]
-                            myDict["SentenceChinese"] = ret[columEnum.SentenceChinese.value]
-                            Dataindex += 1
-                            t1.join()
-                            #print('Pressed RIGHT Button!')
-                            leftClickCnt = 0
-                            app.fillbgColor(blackColor)
-                            app.blitImg("BG",(0,0))
-                            vocabShowInApp = vocabularyDict(app, myDict)
-                            vocabShowInApp.showVocab(whiteColor, WINDOW_W / 2, leftClickCnt)
- #                           vocabShowInApp.showRecordInfo("正在学习第" + str(myVocabulary.indexRow) + "/" + str(rowNumber) + "个单词...",whiteColor,(0,0))
+            if leftClickCnt > 3:
+                t1 = threading.Thread(target=readOutLoudly, args=(myDict["Sentence"],))
+                t1.start()
+            else:
+                t1 = threading.Thread(target=readOutLoudly, args=(myDict["Vocabulary"],))
+                t1.start()
+        elif pressedMousePos == 1:
+            t1.join()
+        elif pressedMousePos == 2:
+            ret = retrievedData[Dataindex]
+            myDict = dict()
+            myDict["Vocabulary"] = ret[columEnum.Vocabulary.value]
+            myDict["Pronounce"] = ret[columEnum.Pronounce.value]
+            myDict["Split"] = ret[columEnum.Split.value]
+            myDict["Chinese"] = ret[columEnum.Chinese.value]
+            myDict["RememberTips"] = ret[columEnum.RememberTips.value]
+            myDict["RememberImage"] = ret[columEnum.RememberImage.value]
+            myDict["Sentence"] = ret[columEnum.Sentence.value]
+            myDict["SentenceChinese"] = ret[columEnum.SentenceChinese.value]
+            Dataindex += 1
+            t1.join()
+            leftClickCnt = 0
+            app.fillbgColor(blackColor)
+            app.blitImg("BG",(0,0))
+            vocabShowInApp = vocabularyDict(app, myDict)
+            vocabShowInApp.showVocab(whiteColor, WINDOW_W / 2, leftClickCnt)
+    #                           vocabShowInApp.showRecordInfo("正在学习第" + str(myVocabulary.indexRow) + "/" + str(rowNumber) + "个单词...",whiteColor,(0,0))
 
-                            app.updateDisp()
-
-#                            if leftClickCnt < 4:
-                                #myVocabulary.saveRemember("YES",recordTimes+1)
-
-                            t1 = threading.Thread(target=readOutLoudly, args=(myDict["Vocabulary"],))
-                            t1.start()
-
+            app.updateDisp()
+            t1 = threading.Thread(target=readOutLoudly, args=(myDict["Vocabulary"],))
+            t1.start()
+        pressedMousePos = -1
     # Save (commit) the changes
     conn.commit()
     # Close the connection
