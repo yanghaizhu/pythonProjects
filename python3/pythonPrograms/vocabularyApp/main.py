@@ -159,6 +159,7 @@ if __name__ == '__main__':
 
     t1 = threading.Thread(target=readOutLoudly, args=(myDict["Vocabulary"],))
     t1.start()
+
     a = 10
     pressedMousePos = -1
     while continueFlag:
@@ -178,6 +179,9 @@ if __name__ == '__main__':
         if pressedMousePos < 0:
             continue
         elif pressedMousePos == 0:
+            if t1.is_alive():
+                continue
+
             app.fillbgColor(blackColor)
             app.blitImg("BG",(0,0))
             #print('Pressed LEFT Button!')
@@ -186,7 +190,6 @@ if __name__ == '__main__':
             vocabShowInApp.showVocab(whiteColor, WINDOW_W / 2, leftClickCnt)
             #vocabShowInApp.showRecordInfo("正在学习第" + str(myVocabulary.indexRow) + "/" + str(rowNumber) + "个单词...",whiteColor,(0,0))
 
-            t1.join()
             app.updateDisp()
 
             if leftClickCnt > 3:
@@ -195,9 +198,9 @@ if __name__ == '__main__':
             else:
                 t1 = threading.Thread(target=readOutLoudly, args=(myDict["Vocabulary"],))
                 t1.start()
-        elif pressedMousePos == 1:
-            t1.join()
         elif pressedMousePos == 2:
+            if t1.is_alive():
+                continue
             ret = retrievedData[Dataindex]
             myDict = dict()
             myDict["Vocabulary"] = ret[columEnum.Vocabulary.value]
@@ -209,7 +212,7 @@ if __name__ == '__main__':
             myDict["Sentence"] = ret[columEnum.Sentence.value]
             myDict["SentenceChinese"] = ret[columEnum.SentenceChinese.value]
             Dataindex += 1
-            t1.join()
+
             leftClickCnt = 0
             app.fillbgColor(blackColor)
             app.blitImg("BG",(0,0))
