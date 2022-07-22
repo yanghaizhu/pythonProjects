@@ -89,13 +89,10 @@ class vocabularyDict:
         self.app.blitText("font2", self.vocab["Pronounce"], color, (pos_x, 80), True)
         if(clickCnt > 0):
             app.blitText("font3", self.vocab["Chinese"], color, (pos_x, 120), True)
-        if(clickCnt > 1):
             app.blitText("font3", self.vocab["Split"], color, (pos_x, 160), True)
-        if(clickCnt > 2):
             app.blitText("font3", self.vocab["RememberImage"], color, (pos_x, 190), True)
-        if(clickCnt > 3):
+        if(clickCnt > 1):
             app.blitText("font3", self.vocab["Sentence"], color, (pos_x, 230), True)
-        if(clickCnt > 4):
             app.blitText("font3", self.vocab["SentenceChinese"], color, (pos_x, 260), True)
 
     def showRecordInfo(self,infoStr,color,pos):
@@ -106,9 +103,17 @@ if __name__ == '__main__':
 
     conn = sqlite3.connect('vocabulary.db')
     c = conn.cursor()
-#    c.execute('''DROP TABLE IF EXISTS vocabulary''')
-    # ID|
-#    c.execute('''CREATE TABLE IF NOT EXISTS vocabulary (ID INTEGER PRIMARY KEY, Vocabulary TEXT, Pronounce TEXT, Split TEXT, Chinese TEXT, RememberTips TEXT, RememberImage TEXT, Sentence TEXT, SentenceChinese TEXT)''')
+#   execute('''DROP TABLE IF EXISTS vocabulary''')
+#   execute('''CREATE TABLE IF NOT EXISTS vocabulary (ID INTEGER PRIMARY KEY, Vocabulary TEXT, Pronounce TEXT, Split TEXT, Chinese TEXT, RememberTips TEXT, RememberImage TEXT, Sentence TEXT, SentenceChinese TEXT)''')
+    c.execute('''CREATE TABLE IF NOT EXISTS counter (rateProgress INTEGER)''')
+    c.execute('''SELECT count(*) FROM  counter''')
+    rets = c.fetchall()
+    if(rets[0][0] == 0):
+        c.execute('''INSERT INTO  counter(rateProgress) VALUES (0)''')
+
+    c.execute('''SELECT * FROM  counter''')
+    rets = c.fetchall()
+    Dataindex = rets[0][0]
 
     # vocabulary table related parameters
     leftClickNumber = 0
@@ -138,7 +143,6 @@ if __name__ == '__main__':
     sql = "SELECT * FROM vocabulary"
     c.execute(sql)
     retrievedData = c.fetchall()
-    Dataindex = 2
     ret = retrievedData[Dataindex]
     myDict = dict()
     myDict["Vocabulary"] = ret[columEnum.Vocabulary.value]
@@ -153,7 +157,7 @@ if __name__ == '__main__':
     print(myDict)
     vocabShowInApp = vocabularyDict(app,myDict)
     vocabShowInApp.showVocab(whiteColor,WINDOW_W/2, leftClickCnt)
-#    vocabShowInApp.showRecordInfo("正在学习第" + str(myVocabulary.indexRow) + "/" + str(rowNumber) + "个单词...",whiteColor,(0,0))
+    vocabShowInApp.showRecordInfo("正在学习第" + str(Dataindex) + "/" + "个单词...",whiteColor,(0,0))
 
     app.updateDisp()
 
@@ -188,11 +192,11 @@ if __name__ == '__main__':
             leftClickCnt = leftClickCnt + 1
             vocabShowInApp = vocabularyDict(app, myDict)
             vocabShowInApp.showVocab(whiteColor, WINDOW_W / 2, leftClickCnt)
-            #vocabShowInApp.showRecordInfo("正在学习第" + str(myVocabulary.indexRow) + "/" + str(rowNumber) + "个单词...",whiteColor,(0,0))
+            vocabShowInApp.showRecordInfo("正在学习第" + str(Dataindex) + "/" + "个单词...",whiteColor,(0,0))
 
             app.updateDisp()
 
-            if leftClickCnt > 3:
+            if leftClickCnt > 1:
                 t1 = threading.Thread(target=readOutLoudly, args=(myDict["Sentence"],))
                 t1.start()
             else:
@@ -218,12 +222,14 @@ if __name__ == '__main__':
             app.blitImg("BG",(0,0))
             vocabShowInApp = vocabularyDict(app, myDict)
             vocabShowInApp.showVocab(whiteColor, WINDOW_W / 2, leftClickCnt)
-    #                           vocabShowInApp.showRecordInfo("正在学习第" + str(myVocabulary.indexRow) + "/" + str(rowNumber) + "个单词...",whiteColor,(0,0))
-
+            vocabShowInApp.showRecordInfo("正在学习第" + str(Dataindex) + "/" + "个单词...",whiteColor,(0,0))
             app.updateDisp()
             t1 = threading.Thread(target=readOutLoudly, args=(myDict["Vocabulary"],))
             t1.start()
         pressedMousePos = -1
+
+    sql = "UPDATE counter SET rateProgress="+str(Dataindex)
+    c.execute(sql)
     # Save (commit) the changes
     conn.commit()
     # Close the connection
