@@ -1,0 +1,6 @@
+git remote add origin https://github.com/yanghaizhu/pythonProjects.git
+git config --global user.name "yanghaizhu"
+git config --global user.email "252489667@qq.com"
+git checkout -b main
+git push -u origin "main"
+git pull

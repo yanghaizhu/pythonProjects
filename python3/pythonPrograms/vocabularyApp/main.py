@@ -29,6 +29,7 @@ def readOutLoudly(sentence:str):
 
 
 class columEnum(Enum):
+    ID = 0
     Vocabulary = 1
     Pronounce = 2
     Chinese = 3
@@ -37,8 +38,58 @@ class columEnum(Enum):
     RememberImage = 6
     Sentence = 7
     SentenceChinese = 8
-    RecordTimes = 9
-    RecordDone = 10
+    EasyDegree = 9
+    EasyCnt = 10
+    NormalCnt = 11
+    HardCnt = 12
+    HardestCnt = 13
+
+class WORD_DETAIL:
+    def __init__(self, vocab):
+        self.ID = vocab[columEnum.ID.value]
+        self.Vocabulary = vocab[columEnum.Vocabulary.value]
+        self.Pronounce = vocab[columEnum.Pronounce.value]
+        self.Split = vocab[columEnum.Split.value]
+        self.Chinese = vocab[columEnum.Chinese.value]
+        self.RememberTips = vocab[columEnum.RememberTips.value]
+        self.RememberImage = vocab[columEnum.RememberImage.value]
+        self.Sentence = vocab[columEnum.Sentence.value]
+        self.SentenceChinese = vocab[columEnum.SentenceChinese.value]
+        self.EasyDegree = vocab[columEnum.EasyDegree.value]
+        self.EasyCnt = vocab[columEnum.EasyCnt.value]
+        self.NormalCnt = vocab[columEnum.NormalCnt.value]
+        self.HardCnt = vocab[columEnum.HardCnt.value]
+        self.HardestCnt = vocab[columEnum.HardestCnt.value]
+
+    def update(self, vocab):
+        self.ID = vocab[columEnum.ID.value]
+        self.Vocabulary = vocab[columEnum.Vocabulary.value]
+        self.Pronounce = vocab[columEnum.Pronounce.value]
+        self.Split = vocab[columEnum.Split.value]
+        self.Chinese = vocab[columEnum.Chinese.value]
+        self.RememberTips = vocab[columEnum.RememberTips.value]
+        self.RememberImage = vocab[columEnum.RememberImage.value]
+        self.Sentence = vocab[columEnum.Sentence.value]
+        self.SentenceChinese = vocab[columEnum.SentenceChinese.value]
+        self.EasyDegree = vocab[columEnum.EasyDegree.value]
+        self.EasyCnt = vocab[columEnum.EasyCnt.value]
+        self.NormalCnt = vocab[columEnum.NormalCnt.value]
+        self.HardCnt = vocab[columEnum.HardCnt.value]
+        self.HardestCnt = vocab[columEnum.HardestCnt.value]
+    def updateCnt(self, mousePosition):
+        self.EasyDegree = mousePosition
+        if (mousePosition == 0):
+            self.EasyCnt += 1
+        elif (mousePosition == 1):
+            self.NormalCnt += 1
+        elif (mousePosition == 2):
+            self.HardCnt += 1
+        elif (mousePosition == 3):
+            self.HardestCnt += 1
+        self.sql = "update vocabulary set EasyDegree=" + str(self.EasyDegree) + ",  easyCnt=" + str(self.EasyCnt) \
+                   + " , normalCnt=" + str(self.NormalCnt) + ",  hardCnt=" + str(self.HardCnt) + " , hardestCnt=" + str(self.HardestCnt) \
+                   + " where ID =" + str(self.ID)
+        print(self.sql)
 
 class PYGAME_FRAME:
     def __init__(self, pygame, screenSize, title):
@@ -76,36 +127,36 @@ class PYGAME_FRAME:
         self.screen.blit(text, posStart)
     def updateDisp(self,):
         self.pygame.display.update()
+        self.fillbgColor(blackColor)
+        self.blitImg("BG",(0,0))
     def fillbgColor(self,color):
         self.screen.fill(color)
     def blitImg(self,name,pos):
         self.screen.blit(self.imgDict[name], pos)
-class vocabularyDict:
-    def __init__(self,app,vocabularyDict):
-        self.app = app
-        self.vocab = vocabularyDict
+
+class VOCAB_APP:
+    def __init__(self,pygameFrame,wordDetail):
+        self.pygameFrame = pygameFrame
+        self.wordDetail = wordDetail
     def showVocab(self,color,pos_x,clickCnt):
-        self.app.blitText("font1", self.vocab["Vocabulary"], color, (pos_x, 40), True)
-        self.app.blitText("font2", self.vocab["Pronounce"], color, (pos_x, 80), True)
+        self.pygameFrame.blitText("font1", self.wordDetail.Vocabulary, color, (pos_x, 40), True)
+        self.pygameFrame.blitText("font2", self.wordDetail.Pronounce, color, (pos_x, 80), True)
         if(clickCnt > 0):
-            app.blitText("font3", self.vocab["Chinese"], color, (pos_x, 120), True)
-            app.blitText("font3", self.vocab["Split"], color, (pos_x, 160), True)
-            app.blitText("font3", self.vocab["RememberImage"], color, (pos_x, 190), True)
+            pygameFrame.blitText("font3", self.wordDetail.Chinese, color, (pos_x, 120), True)
+            pygameFrame.blitText("font3", self.wordDetail.Split, color, (pos_x, 160), True)
+            pygameFrame.blitText("font3", self.wordDetail.RememberImage, color, (pos_x, 190), True)
         if(clickCnt > 1):
-            app.blitText("font3", self.vocab["Sentence"], color, (pos_x, 230), True)
-            app.blitText("font3", self.vocab["SentenceChinese"], color, (pos_x, 260), True)
+            pygameFrame.blitText("font3", self.wordDetail.Sentence, color, (pos_x, 230), True)
+            pygameFrame.blitText("font3", self.wordDetail.SentenceChinese, color, (pos_x, 260), True)
 
     def showRecordInfo(self,infoStr,color,pos):
-        app.blitText("font3", infoStr, color,pos, False)
+        pygameFrame.blitText("font3", infoStr, color,pos, False)
 
 
 if __name__ == '__main__':
 
     conn = sqlite3.connect('vocabulary.db')
     c = conn.cursor()
-#   execute('''DROP TABLE IF EXISTS vocabulary''')
-#   execute('''CREATE TABLE IF NOT EXISTS vocabulary (ID INTEGER PRIMARY KEY, Vocabulary TEXT, Pronounce TEXT, Split TEXT, Chinese TEXT, RememberTips TEXT, RememberImage TEXT, Sentence TEXT, SentenceChinese TEXT)''')
-    c.execute('''CREATE TABLE IF NOT EXISTS counter (rateProgress INTEGER)''')
     c.execute('''SELECT count(*) FROM  counter''')
     rets = c.fetchall()
     if(rets[0][0] == 0):
@@ -128,44 +179,35 @@ if __name__ == '__main__':
     continueFlag = True
     leftClickCnt = 0
 
+# Init pygameFrame
+    pygameFrame = PYGAME_FRAME(pygame,screenSize,"背单词")
+    pygameFrame.addImag("BG","bg.jpg",80)
+    pygameFrame.resizeImag("BG",(800,1500))
+    pygameFrame.addFond("font1",'fonts/msyh.ttc', 35)
+    pygameFrame.addFond("font2",'fonts/arial.ttf', 30)
+    pygameFrame.addFond("font3",'fonts/msyh.ttc', 15)
+    pygameFrame.updateDisp()
 
-
-    app = PYGAME_FRAME(pygame,screenSize,"背单词")
-    app.addImag("BG","bg.jpg",40)
-    app.resizeImag("BG",(800,1500))
-    app.addFond("font1",'fonts/msyh.ttc', 35)
-    app.addFond("font2",'fonts/arial.ttf', 30)
-    app.addFond("font3",'fonts/msyh.ttc', 15)
-
-    app.fillbgColor(blackColor)
-    app.blitImg("BG",(0,0))
-
+# get content to show
     sql = "SELECT * FROM vocabulary"
     c.execute(sql)
     retrievedData = c.fetchall()
     ret = retrievedData[Dataindex]
-    myDict = dict()
-    myDict["Vocabulary"] = ret[columEnum.Vocabulary.value]
-    myDict["Pronounce"] = ret[columEnum.Pronounce.value]
-    myDict["Split"] = ret[columEnum.Split.value]
-    myDict["Chinese"] = ret[columEnum.Chinese.value]
-    myDict["RememberTips"] = ret[columEnum.RememberTips.value]
-    myDict["RememberImage"] = ret[columEnum.RememberImage.value]
-    myDict["Sentence"] = ret[columEnum.Sentence.value]
-    myDict["SentenceChinese"] = ret[columEnum.SentenceChinese.value]
+    wordDetail = WORD_DETAIL(ret)
+
     Dataindex += 1
-    print(myDict)
-    vocabShowInApp = vocabularyDict(app,myDict)
-    vocabShowInApp.showVocab(whiteColor,WINDOW_W/2, leftClickCnt)
+
+    vocabShowInApp = VOCAB_APP(pygameFrame,wordDetail)
+    vocabShowInApp.showVocab(whiteColor, WINDOW_W/2, leftClickCnt)
     vocabShowInApp.showRecordInfo("正在学习第" + str(Dataindex) + "/" + "个单词...",whiteColor,(0,0))
 
-    app.updateDisp()
+    pygameFrame.updateDisp()
 
-    t1 = threading.Thread(target=readOutLoudly, args=(myDict["Vocabulary"],))
+    t1 = threading.Thread(target=readOutLoudly, args=(wordDetail.Vocabulary,))
     t1.start()
 
-    a = 10
     pressedMousePos = -1
+    mousePosition = 0
     while continueFlag:
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
@@ -176,55 +218,43 @@ if __name__ == '__main__':
                 for index in range(len(pressed_array)):
                     if pressed_array[index]:
                         pressedMousePos = index
-                        print(pressedMousePos)
-                        print(a)
-                        a += 1
-
+                        if (index == 2):
+                            pos = pygame.mouse.get_pos()
+                            mousePosition = ((pos[0] > WINDOW_W/2) << 1) | (pos[1] > WINDOW_H/2)
+                            wordDetail.updateCnt(mousePosition)
         if pressedMousePos < 0:
             continue
         elif pressedMousePos == 0:
             if t1.is_alive():
                 continue
-
-            app.fillbgColor(blackColor)
-            app.blitImg("BG",(0,0))
             #print('Pressed LEFT Button!')
             leftClickCnt = leftClickCnt + 1
-            vocabShowInApp = vocabularyDict(app, myDict)
+            vocabShowInApp = VOCAB_APP(pygameFrame, wordDetail)
             vocabShowInApp.showVocab(whiteColor, WINDOW_W / 2, leftClickCnt)
             vocabShowInApp.showRecordInfo("正在学习第" + str(Dataindex) + "/" + "个单词...",whiteColor,(0,0))
 
-            app.updateDisp()
+            pygameFrame.updateDisp()
 
             if leftClickCnt > 1:
-                t1 = threading.Thread(target=readOutLoudly, args=(myDict["Sentence"],))
+                t1 = threading.Thread(target=readOutLoudly, args=(wordDetail.Sentence,))
                 t1.start()
             else:
-                t1 = threading.Thread(target=readOutLoudly, args=(myDict["Vocabulary"],))
+                t1 = threading.Thread(target=readOutLoudly, args=(wordDetail.Vocabulary,))
                 t1.start()
         elif pressedMousePos == 2:
             if t1.is_alive():
                 continue
-            ret = retrievedData[Dataindex]
-            myDict = dict()
-            myDict["Vocabulary"] = ret[columEnum.Vocabulary.value]
-            myDict["Pronounce"] = ret[columEnum.Pronounce.value]
-            myDict["Split"] = ret[columEnum.Split.value]
-            myDict["Chinese"] = ret[columEnum.Chinese.value]
-            myDict["RememberTips"] = ret[columEnum.RememberTips.value]
-            myDict["RememberImage"] = ret[columEnum.RememberImage.value]
-            myDict["Sentence"] = ret[columEnum.Sentence.value]
-            myDict["SentenceChinese"] = ret[columEnum.SentenceChinese.value]
-            Dataindex += 1
 
+            c.execute(wordDetail.sql)
+            ret = retrievedData[Dataindex]
+            wordDetail.update(ret)
+            Dataindex += 1
             leftClickCnt = 0
-            app.fillbgColor(blackColor)
-            app.blitImg("BG",(0,0))
-            vocabShowInApp = vocabularyDict(app, myDict)
+            vocabShowInApp = VOCAB_APP(pygameFrame, wordDetail)
             vocabShowInApp.showVocab(whiteColor, WINDOW_W / 2, leftClickCnt)
             vocabShowInApp.showRecordInfo("正在学习第" + str(Dataindex) + "/" + "个单词...",whiteColor,(0,0))
-            app.updateDisp()
-            t1 = threading.Thread(target=readOutLoudly, args=(myDict["Vocabulary"],))
+            pygameFrame.updateDisp()
+            t1 = threading.Thread(target=readOutLoudly, args=(wordDetail.Vocabulary,))
             t1.start()
         pressedMousePos = -1
 
