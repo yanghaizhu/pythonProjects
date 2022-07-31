@@ -1,6 +1,8 @@
 
 from enum import Enum
 
+from sql_db import *
+
 class columEnum(Enum):
     ID = 0
     Vocabulary = 1
@@ -17,10 +19,25 @@ class columEnum(Enum):
     HardCnt = 12
     HardestCnt = 13
 
+sqlCmd = dict()
+sqlCmd["all"] = "SELECT * FROM  vocabulary"
+sqlCmd["total"] = "SELECT count(*) FROM  vocabulary"
+sqlCmd["noEasy"] = "SELECT * FROM vocabulary where easyDegree > 1 or easyDegree = 0"
+sqlCmd["normal"] = "SELECT * FROM vocabulary where easyDegree =2 or easyDegree =3 or easyDegree=0"
+sqlCmd["hard"] = "SELECT * FROM vocabulary where easyDegree =3 or easyDegree=0"
+sqlCmd["noRecord"] = "SELECT * FROM vocabulary where easyDegree =0"
+sqlCmd["dataIndex"] = "SELECT * FROM counter"
+sqlCmd["initDataIndex"] = "INSERT INTO  counter (rateProgress) VALUES (0)"
+
 class VOCAB_SET:
-    def __init__(self, vocabs, dataIndex=0):
-        self.vocabs = vocabs
-        self.dataIndex = dataIndex
+    def __init__(self, dbName, typeStr = "all"):
+        self.db = SQL_DB(dbName)
+        rets = self.db.run(sqlCmd["dataIndex"], True)
+        self.dataIndex = rets[0][0]
+        self.vocabs = self.db.run(sqlCmd[typeStr], True)
+        rets = self.db.run(sqlCmd["total"], True)
+        self.totalVocab = rets[0][0]
+
 
     def next(self, ):
         vocab = self.vocabs[self.dataIndex]

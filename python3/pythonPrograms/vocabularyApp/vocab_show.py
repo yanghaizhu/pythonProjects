@@ -4,36 +4,20 @@ from vocab_set import *
 from vocab_show import *
 from pygame_frame import *
 
-sqlCmd = dict()
-sqlCmd["all"] = "SELECT * FROM  vocabulary"
-sqlCmd["noEasy"] = "SELECT * FROM vocabulary where easyDegree > 1 or easyDegree = 0"
-sqlCmd["normal"] = "SELECT * FROM vocabulary where easyDegree =2 or easyDegree =3 or easyDegree=0"
-sqlCmd["hard"] = "SELECT * FROM vocabulary where easyDegree =3 or easyDegree=0"
-sqlCmd["noRecord"] = "SELECT * FROM vocabulary where easyDegree =0"
-sqlCmd["dataIndex"] = "SELECT * FROM counter"
-sqlCmd["initDataIndex"] = "INSERT INTO  counter (rateProgress) VALUES (0)"
-
-class VOCAB_SHOW:
+class VOCAB_PYGAME_SHOW:
     def __init__(self, dbName):
         # vocabulary table related parameters
-        WINDOW_W, WINDOW_H = 800, 500
-        blackColor = (0, 0, 0)
-        whiteColor = (255, 255, 255)
-        screenSize = (WINDOW_W, WINDOW_H)
+        self.blackColor = (0, 0, 0)
+        self.whiteColor = (255, 255, 255)
+        self.pygameScreenWidth = 800
+        self.pygameScreenHigh = 500
+        self.pygameScreenSize = (self.pygameScreenWidth , self.pygameScreenHigh)
 
         # Init pygameFrame
-        pygameFrame = PYGAME_FRAME(pygame, screenSize, "背单词")
+        self.pygameFrame = PYGAME_FRAME(pygame, self.pygameScreenSize, "背单词")
+        self.pygameFrame.pygameFrameInit()
 
-        # get content to show
-        db = SQL_DB(dbName)
-        rets = db.run(sqlCmd["dataIndex"], True)
-        dataIndex = rets[0][0]
-        rets = db.run(sqlCmd["all"], True)
-        wordDetail = VOCAB_SET(rets, dataIndex)
-
-        self.pygameFrame = pygameFrame
-        self.wordDetail = wordDetail
-        self.db = db
+        self.wordDetail = VOCAB_SET(dbName)
 
 
     def showVocab(self,color,pos_x,clickCnt):

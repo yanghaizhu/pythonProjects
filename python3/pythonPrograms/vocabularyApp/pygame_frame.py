@@ -17,6 +17,13 @@ class PYGAME_FRAME:
         self.pressedMouseType = -1
         self.continueFlag = True
 
+    def pygameFrameInit(self):
+        self.addImag("BG","bg.jpg",80)
+        self.resizeImag("BG",(800,1500))
+        self.addFond("font1",'fonts/msyh.ttc', 35)
+        self.addFond("font2",'fonts/arial.ttf', 30)
+        self.addFond("font3",'fonts/msyh.ttc', 15)
+
     def addFond(self, name, fontPath, size):
         self.fontDict[name] = self.pygame.font.Font(fontPath, size)
 

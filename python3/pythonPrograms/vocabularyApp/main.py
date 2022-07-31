@@ -32,72 +32,47 @@ def readOutLoudly(sentence:str):
 
 
 if __name__ == '__main__':
-
-    vocabShowInApp = VOCAB_SHOW('vocabulary.db')
-    vocabShowInApp.pygameFrame.addImag("BG","bg.jpg",80)
-    vocabShowInApp.pygameFrame.resizeImag("BG",(800,1500))
-    vocabShowInApp.pygameFrame.addFond("font1",'fonts/msyh.ttc', 35)
-    vocabShowInApp.pygameFrame.addFond("font2",'fonts/arial.ttf', 30)
-    vocabShowInApp.pygameFrame.addFond("font3",'fonts/msyh.ttc', 15)
-
-
-    vocabShowInApp.wordDetail.next()
-
-
+    vocabShowInPygame = VOCAB_PYGAME_SHOW('vocabulary.db')
+    vocabShowInPygame.wordDetail.next()
     leftClickCnt = 0
-
-    vocabShowInApp.showVocab((255,255,255), 800/2, leftClickCnt)
-    vocabShowInApp.showRecordInfo("正在学习第" + str(vocabShowInApp.wordDetail.dataIndex) + "/" + "个单词...",(255,255,255),(0,0))
-
-    vocabShowInApp.updateDisp()
-
-    t1 = threading.Thread(target=readOutLoudly, args=(vocabShowInApp.wordDetail.Vocabulary,))
+    vocabShowInPygame.showVocab((255,255,255), 800/2, leftClickCnt)
+    vocabShowInPygame.showRecordInfo("正在学习第" + str(vocabShowInPygame.wordDetail.dataIndex) + "/" + "个单词...",(255,255,255),(0,0))
+    vocabShowInPygame.updateDisp()
+    t1 = threading.Thread(target=readOutLoudly, args=(vocabShowInPygame.wordDetail.Vocabulary,))
     t1.start()
-
     pressedMouseType = -1
     mousePosition = 0
-
-    while vocabShowInApp.pygameFrame.needContinue():
-        pressedMouseType = vocabShowInApp.pygameFrame.checkEvent()
-
-        mousePosition = ((vocabShowInApp.pygameFrame.pos[0] > 800/2) << 1) | (vocabShowInApp.pygameFrame.pos[1] > 800/2) + 1
-        vocabShowInApp.wordDetail.updateCnt(mousePosition)
-
+    while vocabShowInPygame.pygameFrame.needContinue():
+        pressedMouseType = vocabShowInPygame.pygameFrame.checkEvent()
+        mousePosition = ((vocabShowInPygame.pygameFrame.pos[0] > 800/2) << 1) | (vocabShowInPygame.pygameFrame.pos[1] > 800/2) + 1
+        vocabShowInPygame.wordDetail.updateCnt(mousePosition)
         if pressedMouseType < 0:
             continue
         elif pressedMouseType == 0:
             if t1.is_alive():
                 continue
             leftClickCnt = leftClickCnt + 1
-            vocabShowInApp.showVocab((255,255,255), 800 / 2, leftClickCnt)
-            vocabShowInApp.showRecordInfo("正在学习第" + str(vocabShowInApp.wordDetail.dataIndex) + "/" + "个单词...",
-                                          (255, 255, 255), (0, 0))
-
-            vocabShowInApp.updateDisp()
-
+            vocabShowInPygame.showVocab((255,255,255), 800 / 2, leftClickCnt)
+            vocabShowInPygame.showRecordInfo("正在学习第" + str(vocabShowInPygame.wordDetail.dataIndex) + "/" + "个单词...",(255, 255, 255), (0, 0))
+            vocabShowInPygame.updateDisp()
             if leftClickCnt > 1:
-                t1 = threading.Thread(target=readOutLoudly, args=(vocabShowInApp.wordDetail.Sentence,))
+                t1 = threading.Thread(target=readOutLoudly, args=(vocabShowInPygame.wordDetail.Sentence,))
                 t1.start()
             else:
-                t1 = threading.Thread(target=readOutLoudly, args=(vocabShowInApp.wordDetail.Vocabulary,))
+                t1 = threading.Thread(target=readOutLoudly, args=(vocabShowInPygame.wordDetail.Vocabulary,))
                 t1.start()
         elif pressedMouseType == 2:
             if t1.is_alive():
                 continue
-
-#            vocabShowInApp.db.run(wordDetail.sql)
-            vocabShowInApp.wordDetail.next()
+            vocabShowInPygame.wordDetail.next()
             leftClickCnt = 0
-            vocabShowInApp.showVocab((255, 255, 255), 800 / 2, leftClickCnt)
-            vocabShowInApp.showRecordInfo("正在学习第" + str(vocabShowInApp.wordDetail.dataIndex) + "/" + "个单词...",
-                                          (255, 255, 255), (0, 0))
-            vocabShowInApp.updateDisp()
-            t1 = threading.Thread(target=readOutLoudly, args=(vocabShowInApp.wordDetail.Vocabulary,))
+            vocabShowInPygame.showVocab((255, 255, 255), 800 / 2, leftClickCnt)
+            vocabShowInPygame.showRecordInfo("正在学习第" + str(vocabShowInPygame.wordDetail.dataIndex) + "/" + "个单词...",(255, 255, 255), (0, 0))
+            vocabShowInPygame.updateDisp()
+            t1 = threading.Thread(target=readOutLoudly, args=(vocabShowInPygame.wordDetail.Vocabulary,))
             t1.start()
-        vocabShowInApp.pygameFrame.resetEvent()
-
-    sql = "UPDATE counter SET rateProgress="+str(vocabShowInApp.wordDetail.dataIndex)
-    vocabShowInApp.db.run(sql)
-
-    vocabShowInApp.db.close()
-    vocabShowInApp.pygameFrame.quitPygameFrame()
+        vocabShowInPygame.pygameFrame.resetEvent()
+    sql = "UPDATE counter SET rateProgress="+str(vocabShowInPygame.wordDetail.dataIndex)
+    vocabShowInPygame.wordDetail.db.run(sql)
+    vocabShowInPygame.wordDetail.db.close()
+    vocabShowInPygame.pygameFrame.quitPygameFrame()
